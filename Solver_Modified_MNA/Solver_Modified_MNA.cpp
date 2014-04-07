@@ -45,7 +45,7 @@ int main()
 
 		tr1::cmatch res;
 		//tr1::regex rx("([rlgc]d)s+(d)s+(d)s+(d)");
-		tr1::regex rx("([rLgcV][0-9]+) +([0-9]+) +([0-9])+ +([0-9]+.?[0-9]*)");
+		tr1::regex rx("([rLgcIV][0-9]+) +([0-9]+) +([0-9])+ +([0-9]+.?[0-9]*)");
 		if(regex_search(line.c_str(), res, rx)) {
 		//	cout << "Match" <<endl;
 		}
@@ -76,9 +76,13 @@ int main()
 	//size++;
 	cout <<"No. of nodes=" << size <<endl;
 
+	complex <float>* B = new complex <float>[size];
 	complex <float>** A = new complex <float>*[size];
 	for(int p = 0; p < size; p++)
 		A[p] = new complex <float>[size];
+
+	for (int q=0; q<size; q++)
+			B[q]=0;
 	for (int p=0; p<size;p++)
 		for (int q=0; q<size; q++)
 			A[p][q]=0;
@@ -143,18 +147,24 @@ int main()
 			A[size-LV][size-LV]+=factor*vertex[p].value;			
 
 			LV--;
-
+		}
+		if (vertex[p].type=='I' || vertex[p].type=='V') {
+			if (vertex[p].Na-1 >= 0)
+				B[vertex[p].Na-1 ]+=vertex[p].value;
+			if (vertex[p].Nb-1 >= 0)
+				B[vertex[p].Nb-1 ]-=vertex[p].value;		
 		}
 
 
 	} 
-	complex <float> hundred(100,0);
+
 	for(int p=0; p<size;p++){
 		for (int q=0; q<size; q++)
 			cout << (A[p][q]) << " ";
-		cout << endl;
-	}
-
+		cout << endl;}
+	cout << "B Matrix" << "\n";
+	for (int q=0; q<size; q++)
+			cout << (B[q]) << "\n";
 	getch();
 	return 0;
 }
