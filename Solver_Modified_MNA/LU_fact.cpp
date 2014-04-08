@@ -6,12 +6,9 @@
 #include "MATRIX.h"
 
 
-int LU_fact(int size, int *A, int *L, int *U)
+int LU_fact(int n, int *A, int *L, int *U)
 {
-	
-	for (int m=0; m<size; m++)
-		for (int n=0; n<size; n++){
-			L[m*n+n]=U[m*n+n]=0;
+
 	/*int k,p,q,i,j;
 	
 	for (k=0; k<n; k++){
@@ -45,7 +42,7 @@ int LU_fact(int size, int *A, int *L, int *U)
 			printf("%f\t",U[p][q]);
 		printf("\n");}
 
-	_getch();*/
+*/
 	return 0;
 
 }

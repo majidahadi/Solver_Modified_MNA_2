@@ -26,7 +26,7 @@ int main()
 	int i=0;
 	complex <float> factor(1,0);
 	node vertex[50];
-	ifstream in("circuit.txt");
+	ifstream in("simple_circuit.txt");
 	string line;
 
 	complex <float> s(0,2*M_PI);
@@ -78,16 +78,26 @@ int main()
 	cout <<"No. of nodes=" << size <<endl;
 
 	complex <float>* B = new complex <float>[size];
+	complex <float>* Z = new complex <float>[size];
+	complex <float>* X = new complex <float>[size];
 	complex <float>** A = new complex <float>*[size];
 	for(int p = 0; p < size; p++)
 		A[p] = new complex <float>[size];
+	complex <float>** L = new complex <float>*[size];
+	for(int p = 0; p < size; p++)
+		L[p] = new complex <float>[size];
+	complex <float>** U = new complex <float>*[size];
+	for(int p = 0; p < size; p++)
+		U[p] = new complex <float>[size];
 
 	for (int q=0; q<size; q++)
 			B[q]=0;
 	for (int p=0; p<size;p++)
-		for (int q=0; q<size; q++)
+		for (int q=0; q<size; q++){
 			A[p][q]=0;
-
+			L[p][q]=0;
+			U[p][q]= (p != q ? 0 : 1);
+		}
 
 	for (int p=0; p<size;p++){
 		for (int q=0; q<size; q++)
@@ -151,9 +161,9 @@ int main()
 		}
 		if (vertex[p].type=='I' || vertex[p].type=='V') {
 			if (vertex[p].Na-1 >= 0)
-				B[vertex[p].Na-1 ]+=vertex[p].value;
+				B[vertex[p].Na-1 ]-=vertex[p].value;
 			if (vertex[p].Nb-1 >= 0)
-				B[vertex[p].Nb-1 ]-=vertex[p].value;		
+				B[vertex[p].Nb-1 ]+=vertex[p].value;		
 		}
 
 
@@ -162,10 +172,63 @@ int main()
 	for(int p=0; p<size;p++){
 		for (int q=0; q<size; q++)
 			cout << (A[p][q]) << " ";
-		cout << endl;}
+		cout << endl;
+	}
 	cout << "B Matrix" << "\n";
 	for (int q=0; q<size; q++)
 			cout << (B[q]) << "\n";
+	/////////////////////////////////LU Factorization///////////////////////////////
+	
+	for (int k=0; k<size ; k++){
+		for (int p=0; p<=k; p++){
+			L[k][p]=A[k][p];
+			for (int m=0; m<p; m++)
+				L[k][p]-=L[k][m]*U[m][p];
+		}
+		for (int q=k+1; q<size; q++){
+			U[k][q]=A[k][q];
+			for (int n=0;n<k;n++)
+				U[k][q]-=L[k][n]*U[n][q];
+			U[k][q]/=L[k][k];
+		}
+	}
+
+	cout << "L Matrix" << "\n";
+	for(int p=0; p<size;p++){
+		for (int q=0; q<size; q++)
+			cout << (L[p][q]) << " ";
+		cout << endl;
+	}
+	cout << "U Matrix" << "\n";
+	for(int p=0; p<size;p++){
+		for (int q=0; q<size; q++)
+			cout << (U[p][q]) << " ";
+		cout << endl;
+	}
+
+	////////////////////////////////////solving for Z matrix and X matrix////////////////////////////
+	Z[0]=B[0]/L[0][0];
+	complex <float> sum;
+	for (int m=1; m<size; m++){
+		sum=0;
+		for (int n=0; n<m; n++)
+			sum += L[m][n]*Z[n];
+		Z[m]=(B[m]-sum)/L[m][m];
+	}
+
+	X[size-1]=Z[size-1];
+	for (int m=size-2; m>=0; m--){
+		sum=0;
+		for (int n=m+1; n<=size-1; n++)
+			sum += U[m][n]*Z[n];
+		X[m]=Z[m]-sum;
+	}
+
+	cout << "X Matrix" << "\n";
+	for (int q=0; q<size; q++)
+			cout << (X[q]) << "\n";
+
+
 	getch();
 	return 0;
 }
