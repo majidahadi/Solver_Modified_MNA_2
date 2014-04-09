@@ -26,7 +26,7 @@ int main()
 	int i=0;
 	complex <float> factor(1,0);
 	node vertex[50];
-	ifstream in("simple_circuit.txt");
+	ifstream in("circuit2.txt");
 	string line;
 
 	complex <float> s(0,2*M_PI);
@@ -215,18 +215,24 @@ int main()
 			sum += L[m][n]*Z[n];
 		Z[m]=(B[m]-sum)/L[m][m];
 	}
+	cout << "Z Matrix" << "\n";
+	for (int q=0; q<size; q++)
+			cout << (Z[q]) << "\n";
 
-	X[size-1]=Z[size-1];
-	for (int m=size-2; m>=0; m--){
+	
+	for (int m=size-1; m>=0; m--){
 		sum=0;
 		for (int n=m+1; n<=size-1; n++)
-			sum += U[m][n]*Z[n];
+			sum += U[m][n]*X[n];
 		X[m]=Z[m]-sum;
 	}
 
 	cout << "X Matrix" << "\n";
 	for (int q=0; q<size; q++)
-			cout << (X[q]) << "\n";
+		cout << X[q] << "\n";
+
+
+
 
 
 	getch();
